@@ -1,0 +1,30 @@
+.navbar {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 15px;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  color: #333 !important;
+  font-size: 1.2rem;
+}
+
+.nav-link {
+  color: #333 !important;
+  margin-right: 20px;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: #007bff !important;
+}
+
+.dropdown-toggle {
+  border: 1px solid #ccc;
+}
+
+.container-fluid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
