@@ -10,13 +10,6 @@
     </div>
   </div>
   <div class="panel-body">
-    <div class="row contact-item" *ngFor="let contact of contacts">
-      <div class="col-xs-2">
-        <img [src]="contact.imageUrl" alt="{{ contact.name }}" class="img-responsive" style="max-height: 50px;">
-      </div>
-      <div class="col-xs-10">
-        <span class="pull-left">{{ contact.name }}</span>
-      </div>
-    </div>
+    <app-contact-item *ngFor="let contact of contacts" [contact]="contact" (click)="onSelected(contact)"></app-contact-item>
   </div>
 </div>
