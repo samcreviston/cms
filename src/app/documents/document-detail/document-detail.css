@@ -1,3 +1,13 @@
+.panel {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.btn-group {
+  display: inline-flex;
+  gap: 5px;
+}
+
 .title {
   font-weight: bold;
   padding-left: 1rem;
@@ -12,4 +22,12 @@
 .pad-left-right{
   margin-left:1rem;
   margin-right:1rem;
+}
+
+.btn {
+  margin-left: 5px;
+}
+
+.btn:first-child {
+  margin-left: 0;
 }
