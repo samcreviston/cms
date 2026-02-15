@@ -10,8 +10,8 @@
     </div>
     <div class="row">
       <div class="col-xs-12">
-        <button class="btn btn-primary">Edit</button>
-        <button class="btn btn-danger">Delete</button>
+        <a class="btn btn-primary" [routerLink]="[contact?.id, 'edit']">Edit</a>
+        <a class="btn btn-danger" (click)="onDelete()">Delete</a>
       </div>
     </div>
   </div>
