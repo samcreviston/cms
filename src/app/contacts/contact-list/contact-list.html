@@ -1,15 +1,27 @@
 <div class="panel panel-default">
   <div class="panel-heading">
     <div class="row">
-      <div class="col-xs-6">
-        <span class="title pull-left">Contacts</span>
-      </div>
-      <div class="col-xs-6">
-        <button class="btn btn-success pull-right" [routerLink]="['new']">New Contact</button>
+      <div class="col-xs-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="row">
+              <span class="title pad-left-right">Contacts</span>
+            </div>
+            <div class="row">
+              <div class="input-group pull-left pad-left-right col-xs-7">
+                <input type="text" #searchBox class="form-control" placeholder="Enter a search value" (keyup)="search(searchBox.value)">
+                <div class="glyphicon glyphicon-search input-group-addon" (click)="search(searchBox.value)"></div>
+              </div>
+              <div class="pull-right pad-left-right">
+                <a class="btn btn-success" [routerLink]="['new']">New Contact</a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
   <div class="panel-body">
-    <app-contact-item *ngFor="let contact of contacts" [contact]="contact"></app-contact-item>
+    <app-contact-item *ngFor="let contact of contacts | contactsFilter:term" [contact]="contact"></app-contact-item>
   </div>
 </div>
