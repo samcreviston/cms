@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Message } from '../message.model';
 import { MessageService } from '../message.service';
+import { ContactService } from '../../contacts/contact.service';
 
 @Component({
   selector: 'app-message-edit',
@@ -11,9 +12,17 @@ import { MessageService } from '../message.service';
 export class MessageEdit {
   @ViewChild('subject') subjectRef: ElementRef;
   @ViewChild('msgText') msgTextRef: ElementRef;
-  currentSender: string = 'Sam Creviston';
+  currentSender: string = '';
 
-  constructor(private messageService: MessageService) {}
+  constructor(
+    private messageService: MessageService,
+    private contactService: ContactService
+  ) {
+    const contacts = this.contactService.getContacts();
+    if (contacts && contacts.length > 0) {
+      this.currentSender = contacts[0]._id || '';
+    }
+  }
 
   onSendMessage() {
     const subject = this.subjectRef.nativeElement.value;

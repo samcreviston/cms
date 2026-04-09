@@ -2,7 +2,6 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Document } from './document.model';
-import { MOCKDOCUMENTS } from './MOCKDOCUMENTS';
 
 @Injectable({
   providedIn: 'root'
@@ -11,19 +10,16 @@ export class DocumentService {
   documents: Document[] = [];
   documentSelectedEvent = new EventEmitter<Document>();
   documentListChangedEvent = new Subject<Document[]>();
-  maxDocumentId: number;
 
   constructor(private http: HttpClient) {
     this.documents = [];
-    this.maxDocumentId = this.getMaxId();
   }
 
   getDocuments(): Document[] {
-    this.http.get<Document[]>('https://cms-430-1c183-default-rtdb.firebaseio.com/documents.json')
+    this.http.get<{ message: string; documents: Document[] }>('http://localhost:3000/documents')
       .subscribe(
-        (documents: Document[]) => {
-          this.documents = documents;
-          this.maxDocumentId = this.getMaxId();
+        (responseData) => {
+          this.documents = responseData.documents ?? [];
           this.documents.sort((a, b) => {
             if (a.name < b.name) return -1;
             if (a.name > b.name) return 1;
@@ -47,60 +43,73 @@ export class DocumentService {
     return null;
   }
 
-  getMaxId(): number {
-    let maxId = 0;
-    for (const document of this.documents) {
-      const currentId = parseInt(document.id);
-      if (currentId > maxId) {
-        maxId = currentId;
-      }
-    }
-    return maxId;
-  }
-
-  storeDocuments() {
-    const documentsString = JSON.stringify(this.documents);
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    this.http.put('https://cms-430-1c183-default-rtdb.firebaseio.com/documents.json', documentsString, { headers })
-      .subscribe(
-        () => {
-          this.documentListChangedEvent.next(this.documents.slice());
-        }
-      );
-  }
-
-  addDocument(newDocument: Document) {
-    if (!newDocument) {
+  addDocument(document: Document) {
+    if (!document) {
       return;
     }
-    this.maxDocumentId++;
-    newDocument.id = this.maxDocumentId.toString();
-    this.documents.push(newDocument);
-    this.storeDocuments();
+
+    document.id = '';
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    this.http
+      .post<{ message: string; document: Document }>('http://localhost:3000/documents', document, {
+        headers: headers,
+      })
+      .subscribe((responseData) => {
+        this.documents.push(responseData.document);
+        this.sortAndSend();
+      });
   }
 
   updateDocument(originalDocument: Document, newDocument: Document) {
     if (!originalDocument || !newDocument) {
       return;
     }
-    const pos = this.documents.indexOf(originalDocument);
+
+    const pos = this.documents.findIndex((d) => d.id === originalDocument.id);
+
     if (pos < 0) {
       return;
     }
+
     newDocument.id = originalDocument.id;
-    this.documents[pos] = newDocument;
-    this.storeDocuments();
+    newDocument._id = originalDocument._id;
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    this.http
+      .put('http://localhost:3000/documents/' + originalDocument.id, newDocument, { headers: headers })
+      .subscribe(() => {
+        this.documents[pos] = newDocument;
+        this.sortAndSend();
+      });
   }
 
   deleteDocument(document: Document) {
     if (!document) {
       return;
     }
-    const pos = this.documents.indexOf(document);
+
+    const pos = this.documents.findIndex((d) => d.id === document.id);
+
     if (pos < 0) {
       return;
     }
-    this.documents.splice(pos, 1);
-    this.storeDocuments();
+
+    this.http.delete('http://localhost:3000/documents/' + document.id).subscribe(() => {
+      this.documents.splice(pos, 1);
+      this.sortAndSend();
+    });
+  }
+
+  private sortAndSend() {
+    this.documents.sort((a, b) => {
+      if (a.name < b.name) return -1;
+      if (a.name > b.name) return 1;
+      return 0;
+    });
+
+    this.documentListChangedEvent.next(this.documents.slice());
   }
 }
